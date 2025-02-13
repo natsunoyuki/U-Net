@@ -1,0 +1,28 @@
+experiment_name: "coco2017"
+name: "coco2017"
+exp_file: "exps/example/custom/yolox_s.py"
+
+ckpt: "yolox_s.pth"
+
+conf: 0.25
+nms: 0.3
+tsize: null
+seed: null
+
+batch_size: 16
+
+devices: null
+num_machines: 1
+machine_rank: 0
+
+dist_backend: nccl
+dist_url: null
+
+fp16: False
+legacy: False
+fuse: False
+trt: False
+
+opts: []
+test: False
+speed: False

@@ -1,0 +1,25 @@
+experiment_name: "coco2017"
+name: "coco2017"
+exp_file: "exps/example/custom/yolox_s.py"
+
+batch_size: 16
+
+devices: null
+
+resume: False
+ckpt: null
+start_epoch: null
+
+fp16: True
+
+num_machines: 1
+machine_rank: 0
+
+cache: "ram"
+occupy: False
+logger: "tensorboard"
+
+opts: []
+
+dist_backend: nccl
+dist_url: null

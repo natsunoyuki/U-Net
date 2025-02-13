@@ -1,0 +1,21 @@
+demo: "image"
+path: "./assets/dog.jpg"
+
+conf: 0.25
+nms: 0.3
+tsize: null
+
+experiment_name: "coco2017"
+name: "coco2017"
+exp_file: "exps/default/yolox_s.py"
+ckpt: "yolox_s.pth"
+
+camid: 0
+save_result: True
+
+device: "cpu"
+fp16: False
+
+legacy: False
+fuse: False
+trt: False
