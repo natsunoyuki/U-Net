@@ -21,15 +21,16 @@ def train_unet(configs):
         handlers=logging_handlers,
     )
     """
-
     # Device.
-    device = configs.get("device", torch.device("cuda" if torch.cuda.is_available() else "cpu"))
-    
+    device = configs.get(
+        "device", 
+        torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    )
     print("Using device: {}.".format(device))
 
     # U-Net.
-    in_channels = configs.get("in_channels", 1)
-    out_channels = configs.get("out_channels", 2)
+    in_channels = configs.get("in_channels", 3)
+    out_channels = configs.get("out_channels", 1)
     conv_channels = configs.get("conv_channels", [64, 128, 256, 512, 1024])
     
     unet = UNet(in_channels, out_channels, conv_channels)
@@ -61,4 +62,70 @@ def train_unet(configs):
     )
 
 
+    # Create the DataLoaders from the Datasets. 
+    batch_size = configs.get("batch_size", 4)
+
+    train_dl = torch.utils.data.DataLoader(
+        train_ds, batch_size = batch_size, shuffle = True, collate_fn = collate_fn
+    )
+
+    test_dl = torch.utils.data.DataLoader(
+        test_ds, batch_size = batch_size, shuffle = False, collate_fn = collate_fn
+    )
+
+
     return
+
+
+def collate_fn(batch):
+    return tuple(zip(*batch))
+
+
+def unbatch(batch, device):
+    X, y = batch
+    X = [x.to(device) for x in X]
+    y = [{k: v.to(device) for k, v in t.items()} for t in y]
+    return X, y
+
+
+def train_batch(batch, model, optimizer, device):
+    model.train()
+    X, y = unbatch(batch, device = device)
+    optimizer.zero_grad()
+    losses = model(X, y)
+    loss = sum(loss for loss in losses.values())
+    loss.backward()
+    optimizer.step()
+    return loss, losses
+
+
+@torch.no_grad()
+def validate_batch(batch, model, optimizer, device):
+    model.train()
+    X, y = unbatch(batch, device = device)
+    optimizer.zero_grad()
+    losses = model(X, y)
+    loss = sum(loss for loss in losses.values())
+    return loss, losses
+
+
+def train(
+    model, 
+    optimizer, 
+    n_epochs, 
+    train_loader, 
+    test_loader = None, 
+    device = torch.device("cpu")
+):
+    model.to(device)
+
+    for epoch in range(n_epochs):
+        N = len(train_loader)
+        for ix, batch in enumerate(train_loader):
+            loss, losses = train_batch(batch, model, optimizer, device)
+
+        if test_loader is not None:
+            N = len(test_loader)
+            for ix, batch in enumerate(test_loader):
+                loss, losses = validate_batch(batch, model, optimizer, device)
+    

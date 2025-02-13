@@ -45,6 +45,7 @@ class PILToTensor(torch.nn.Module):
         image = pil_to_tensor(image)
         if mask is not None:
             mask = pil_to_tensor(mask)
+            mask = mask.round().to(int)
         return image, mask
 
 
