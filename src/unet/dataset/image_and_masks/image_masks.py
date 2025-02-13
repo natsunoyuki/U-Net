@@ -1,0 +1,42 @@
+from pathlib import Path
+import torch
+import natsort
+from PIL import Image
+import numpy as np
+
+
+from unet.dataset.image_and_masks.transforms import get_transform
+
+
+class ImageMasksDataset(torch.utils.data.Dataset):
+    def __init__(
+        self, 
+        data_dir: Path, 
+        image_folder="images/", 
+        mask_folder="masks/", 
+        transforms=get_transform(),
+    ):
+        self.data_dir = data_dir
+        self.image_folder = image_folder
+        self.mask_folder = mask_folder
+
+        self.image_files = natsort.natsorted((data_dir / image_folder).iterdir())
+        self.mask_files = natsort.natsorted((data_dir / image_folder).iterdir())
+
+        self.transforms = transforms
+
+    def __getitem__(self, i):
+        image_name = self.image_files[i]
+        mask_name = self.mask_files[i]
+
+        assert image_name.name == mask_name.name
+
+        img = Image.open(image_name).convert("RGB")
+        mask = Image.open(mask_name).convert("RGB")
+
+        if self.transforms is not None:
+            img, mask = self.transforms(img, mask)
+
+    def __len__(self):
+        return len(self.mask_files)
+    

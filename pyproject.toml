@@ -1,5 +1,7 @@
 [build-system]
 requires = [
     "torch",
+    "pycocotools",
+    "natsort",
 ]
 build-backend = "setuptools.build_meta"
