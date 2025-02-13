@@ -36,7 +36,7 @@ class ImageMasksDataset(torch.utils.data.Dataset):
         assert image_name.name == mask_name.name
 
         img = Image.open(image_name).convert("RGB")
-        mask = Image.open(mask_name).convert("RGB")
+        mask = Image.open(mask_name).convert("L")
 
         if self.transforms is not None:
             img, mask = self.transforms(img, mask)
