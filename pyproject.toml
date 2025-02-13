@@ -1,7 +1,10 @@
 [build-system]
 requires = [
+    "pillow",
     "torch",
+    "torchvision",
     "pycocotools",
     "natsort",
+    "tqdm",
 ]
 build-backend = "setuptools.build_meta"
