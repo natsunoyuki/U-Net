@@ -14,7 +14,8 @@ class ImageMasksDataset(torch.utils.data.Dataset):
         data_dir: Path, 
         image_folder="images/", 
         mask_folder="masks/", 
-        transforms=get_transform(),
+        transforms=None,
+        train=False,
     ):
         self.data_dir = data_dir
         self.image_folder = image_folder
@@ -24,6 +25,9 @@ class ImageMasksDataset(torch.utils.data.Dataset):
         self.mask_files = natsort.natsorted((data_dir / image_folder).iterdir())
 
         self.transforms = transforms
+        self.train = train
+        if self.transforms is None:
+            transforms = get_transform(train)
 
     def __getitem__(self, i):
         image_name = self.image_files[i]
