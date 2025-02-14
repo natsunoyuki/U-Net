@@ -24,10 +24,11 @@ class ImageMasksDataset(torch.utils.data.Dataset):
         self.image_files = natsort.natsorted((data_dir / image_folder).iterdir())
         self.mask_files = natsort.natsorted((data_dir / image_folder).iterdir())
 
-        self.transforms = transforms
         self.train = train
+
+        self.transforms = transforms
         if self.transforms is None:
-            transforms = get_transform(train)
+            self.transforms = get_transform(train)
 
 
     def __getitem__(self, i):

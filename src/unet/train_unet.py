@@ -36,9 +36,9 @@ def train_unet(configs):
     out_channels = configs.get("out_channels", 1)
     conv_channels = configs.get("conv_channels", [64, 128, 256, 512, 1024])
     
-    unet = UNet(in_channels, out_channels, conv_channels)
-    unet.to(device)
-    unet.train()
+    model = UNet(in_channels, out_channels, conv_channels)
+    model.to(device)
+    model.train()
 
     print("U-Net in_channels={}, out_channels={}, conv_channels={}.".format(
         in_channels, out_channels, conv_channels)
