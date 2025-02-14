@@ -1,5 +1,6 @@
 import torch
 import tqdm
+import numpy as np
 
 
 def collate_fn(batch):
@@ -50,21 +51,28 @@ def train(
     test_losses = []
     for epoch in range(n_epochs):
         losses = []
+        print("Training ", end="")
         for i, batch in enumerate(train_loader):
             loss = train_batch(batch, model, optimizer, loss_function, device)
-            losses.append(loss)
-        train_losses.append(torch.mean(losses))
+            losses.append(loss.detach().cpu())
+            print("#", end="")
+        train_losses.append(np.mean(losses))
+        print()
 
-        losses = []
+        print("Testing  ", end="")
         if test_loader is not None:
+            losses = []
             for i, batch in enumerate(test_loader):
                 loss = validate_batch(batch, model, optimizer, loss_function, device)
-                losses.append(loss)
-            test_losses.append(torch.mean(losses))
+                losses.append(loss.detach().cpu())
+                print("#", end="")
+            test_losses.append(np.mean(losses))
+        print()
 
         if verbose is True:
-            print("Epoch {:1000d}. Train loss: {}. Test loss: {}.".format(
-                epoch, train_losses[-1], test_losses[-1])
+            print("Epoch {}. Train loss: {}. Test loss: {}.".format(
+                    epoch, train_losses[-1], test_losses[-1]
+                )
             )
     
     return model, train_losses, test_losses
