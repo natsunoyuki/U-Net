@@ -29,6 +29,7 @@ class ImageMasksDataset(torch.utils.data.Dataset):
         if self.transforms is None:
             transforms = get_transform(train)
 
+
     def __getitem__(self, i):
         image_name = self.image_files[i]
         mask_name = self.mask_files[i]
@@ -40,6 +41,9 @@ class ImageMasksDataset(torch.utils.data.Dataset):
 
         if self.transforms is not None:
             img, mask = self.transforms(img, mask)
+
+        return img, mask
+
 
     def __len__(self):
         return len(self.mask_files)
