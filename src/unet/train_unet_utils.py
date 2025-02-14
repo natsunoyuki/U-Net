@@ -5,7 +5,6 @@ import numpy as np
 
 def collate_fn(batch):
     """Collate function for torch DataLoader."""
-    #return tuple(zip(*batch))
     Xs, ys = zip(*batch)
     return torch.stack(Xs), torch.stack(ys)
 
@@ -14,7 +13,6 @@ def unbatch(batch, device=torch.device("cpu")):
     """Unbatches the images and masks in each batch."""
     images, masks = batch
     return images.to(device), masks.to(device)
-    #return [x.to(device) for x in images], [y.to(device) for y in masks]
 
 
 def train_batch(batch, model, optimizer, loss_function, device=torch.device("cpu")):
@@ -49,13 +47,14 @@ def train(
     model.to(device)
     train_losses = []
     test_losses = []
+    print("================ Epoch {:04d} ================".format(epoch + 1))
     for epoch in range(n_epochs):
         losses = []
         print("Training ", end="")
         for i, batch in enumerate(train_loader):
             loss = train_batch(batch, model, optimizer, loss_function, device)
             losses.append(loss.detach().cpu())
-            print("#", end="")
+            print("+", end="")
         train_losses.append(np.mean(losses))
         print()
 
@@ -65,13 +64,13 @@ def train(
             for i, batch in enumerate(test_loader):
                 loss = validate_batch(batch, model, optimizer, loss_function, device)
                 losses.append(loss.detach().cpu())
-                print("#", end="")
+                print("-", end="")
             test_losses.append(np.mean(losses))
         print()
 
         if verbose is True:
-            print("Epoch {}. Train loss: {}. Test loss: {}.".format(
-                    epoch, train_losses[-1], test_losses[-1]
+            print("Train loss: {:.3f}. Test loss: {:.3f}.".format(
+                    epoch+1, train_losses[-1], test_losses[-1]
                 )
             )
     
