@@ -4,8 +4,8 @@ import torch
 #import logging
 #logger = logging.getLogger(__name__)
 
-from unet.unet import UNet
-from unet.dataset.image_and_masks.image_masks import ImageMasksDataset
+from unet.unet_model import UNet
+from unet.unet_dataset.image_and_masks.image_masks import ImageMasksDataset
 
 
 def train_unet(configs):

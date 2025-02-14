@@ -5,7 +5,7 @@ from PIL import Image
 import numpy as np
 
 
-from unet.dataset.image_and_masks.transforms import get_transform
+from unet.unet_dataset.image_and_masks.transforms import get_transform
 
 
 class ImageMasksDataset(torch.utils.data.Dataset):

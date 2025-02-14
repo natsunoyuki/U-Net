@@ -1,7 +1,7 @@
 import torch
 
-from unet.unet.unet_encoder import Encoder
-from unet.unet.unet_decoder import Decoder
+from unet.unet_model.unet_encoder import Encoder
+from unet.unet_model.unet_decoder import Decoder
 
 
 class UNet(torch.nn.Module):

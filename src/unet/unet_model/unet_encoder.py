@@ -1,6 +1,6 @@
 import torch
 
-from unet.unet.unet_blocks import DoubleConv2d, MaxPoolDoubleConv2d
+from unet.unet_model.unet_blocks import DoubleConv2d, MaxPoolDoubleConv2d
 
 
 class Encoder(torch.nn.Module):

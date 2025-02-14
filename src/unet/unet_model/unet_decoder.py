@@ -1,6 +1,6 @@
 import torch
 
-from unet.unet.unet_blocks import UpConvDoubleConv2d
+from unet.unet_model.unet_blocks import UpConvDoubleConv2d
 
 
 class Decoder(torch.nn.Module):
