@@ -78,14 +78,17 @@ def train_unet(configs):
     )
 
 
-    # Set up optimizer.
-    params = [p for p in model.parameters() if p.requires_grad]
-    optimizer = torch.optim.SGD(
-        params, lr = 0.005, momentum = 0.9, weight_decay = 0.0005
-    )
+    # Set up optimizer and loss function.
+    loss_function = torch.nn.BCELoss()
 
+    params = [p for p in model.parameters() if p.requires_grad]
+    optimizer = torch.optim.SGD(params, lr = 0.005, momentum = 0.9, weight_decay = 0.0005)
+
+    
+    # Train the model.
     model, train_losses, test_losses = train(
-        model, optimizer, n_epochs, train_dl, test_dl, device
+        model, optimizer, loss_function, n_epochs, train_dl, test_loader=test_dl, 
+        device=device, verbose=configs.get("verbose", True),
     )
 
     return

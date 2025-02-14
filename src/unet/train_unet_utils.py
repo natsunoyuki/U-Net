@@ -4,54 +4,67 @@ import tqdm
 
 def collate_fn(batch):
     """Collate function for torch DataLoader."""
-    return tuple(zip(*batch))
+    #return tuple(zip(*batch))
+    Xs, ys = zip(*batch)
+    return torch.stack(Xs), torch.stack(ys)
 
 
-def unbatch(batch, device):
+def unbatch(batch, device=torch.device("cpu")):
     """Unbatches the images and masks in each batch."""
-    image, mask = batch
-    X = [x.to(device) for x in image]
-    y = [y.to(device) for y in mask]
-    return X, y
+    images, masks = batch
+    return images.to(device), masks.to(device)
+    #return [x.to(device) for x in images], [y.to(device) for y in masks]
 
 
-def train_batch(batch, model, optimizer, device):
+def train_batch(batch, model, optimizer, loss_function, device=torch.device("cpu")):
     """Trains the model on a batch of images and masks."""
     model.train()
-    X, y = unbatch(batch, device = device)
+    Xs, ys = unbatch(batch, device = device)
     optimizer.zero_grad()
-    losses = model(X, y)
-    loss = sum(loss for loss in losses.values())
+    y_preds = model(Xs)
+    loss = loss_function(y_preds, ys)
     loss.backward()
     optimizer.step()
-    return loss, losses
+    return loss
 
 
 @torch.no_grad()
-def validate_batch(batch, model, optimizer, device):
+def validate_batch(batch, model, optimizer, loss_function, device=torch.device("cpu")):
     """Validates the model on a batch of images and masks."""
     model.train()
-    X, y = unbatch(batch, device = device)
+    Xs, ys = unbatch(batch, device = device)
     optimizer.zero_grad()
-    losses = model(X, y)
-    loss = sum(loss for loss in losses.values())
-    return loss, losses
+    with torch.no_grad():
+        y_preds = model(Xs)
+    loss = loss_function(y_preds, ys)
+    return loss
 
 
-def train(model, optimizer, n_epochs, train_loader, test_loader = None, device = torch.device("cpu")):
+def train(
+    model, optimizer, loss_function, n_epochs, train_loader, test_loader=None, 
+    device=torch.device("cpu"), verbose=False,
+):
+    """Trains a model over n_epochs with an optimizer, loss function and data loaders."""
     model.to(device)
     train_losses = []
     test_losses = []
     for epoch in range(n_epochs):
-        N = len(train_loader)
+        losses = []
         for i, batch in enumerate(train_loader):
-            loss, losses = train_batch(batch, model, optimizer, device)
-            train_losses.append([loss, losses])
+            loss = train_batch(batch, model, optimizer, loss_function, device)
+            losses.append(loss)
+        train_losses.append(torch.mean(losses))
 
+        losses = []
         if test_loader is not None:
-            N = len(test_loader)
             for i, batch in enumerate(test_loader):
-                loss, losses = validate_batch(batch, model, optimizer, device)
-                test_losses.append([loss, losses])
+                loss = validate_batch(batch, model, optimizer, loss_function, device)
+                losses.append(loss)
+            test_losses.append(torch.mean(losses))
+
+        if verbose is True:
+            print("Epoch {:1000d}. Train loss: {}. Test loss: {}.".format(
+                epoch, train_losses[-1], test_losses[-1])
+            )
     
     return model, train_losses, test_losses

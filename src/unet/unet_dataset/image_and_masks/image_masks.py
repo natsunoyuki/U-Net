@@ -22,7 +22,16 @@ class ImageMasksDataset(torch.utils.data.Dataset):
         self.mask_folder = mask_folder
 
         self.image_files = natsort.natsorted((data_dir / image_folder).iterdir())
+        for f in self.image_files:
+            if f.name == ".DS_Store":
+                self.image_files.remove(f)
+        self.image_files = natsort.natsorted(self.image_files)
+        
         self.mask_files = natsort.natsorted((data_dir / image_folder).iterdir())
+        for f in self.mask_files:
+            if f.name == ".DS_Store":
+                self.mask_files.remove(f)
+        self.mask_files = natsort.natsorted(self.mask_files)
 
         self.train = train
 

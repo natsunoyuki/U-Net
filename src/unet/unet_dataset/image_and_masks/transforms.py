@@ -3,24 +3,15 @@ import torchvision.transforms.transforms as T
 import torch
 
 
-def get_transform(train: bool = False):
-    """
-    Transforms a PIL Image into a torch tensor, and performs
-    random horizontal flipping of the image if training a model.
-    Inputs
-        train: bool
-            Flag indicating whether model training will occur.
-    Returns
-        compose: Compose
-            Composition of image transforms.
-    """
+def get_transform(train: bool=False, image_size=[512, 512]):
     transforms = []
-    # ToTensor is applied to all images.
+    if image_size is not None:
+        transforms.append(Resize(image_size))
+
     transforms.append(PILToTensor())
-    # The following transforms are applied only to the train set.
     if train is True:
         transforms.append(RandomHorizontalFlip(0.5))
-        # Other transforms can be added here later on.
+
     return Compose(transforms)
 
 
@@ -45,7 +36,19 @@ class PILToTensor(torch.nn.Module):
         image = pil_to_tensor(image)
         if mask is not None:
             mask = pil_to_tensor(mask)
-            mask = mask.round().to(int)
+            mask = mask.round()
+        return image, mask
+
+
+class Resize(torch.nn.Module):
+    def __init__(self, new_size = [512, 512]):
+        super().__init__()
+        self.resize = T.Resize(new_size)
+
+    def forward(self, image, mask = None):
+        image = self.resize(image)
+        if mask is not None:
+            mask = self.resize(mask)
         return image, mask
 
 

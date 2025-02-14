@@ -7,7 +7,7 @@ from unet.unet_model.unet_decoder import Decoder
 class UNet(torch.nn.Module):
     """UNet model described in https://arxiv.org/pdf/1505.04597."""
     def __init__(
-        self, in_channels=1, out_channels=2, conv_channels=[64, 128, 256, 512, 1024]
+        self, in_channels=1, out_channels=1, conv_channels=[8, 16, 32],
     ):
         super().__init__()
         self.encoder = Encoder(
@@ -19,8 +19,11 @@ class UNet(torch.nn.Module):
             up_conv_kernel_size=2, up_conv_stride=2, up_conv_padding=0, up_conv_bias=False, 
         )
 
+        self.sigmoid = torch.nn.Sigmoid()
+
     def forward(self, x):
         encoder_outputs = self.encoder(x)
         x = self.decoder(encoder_outputs) 
+        x = self.sigmoid(x)
         return x
         
