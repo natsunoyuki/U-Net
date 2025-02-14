@@ -47,31 +47,38 @@ def train(
     model.to(device)
     train_losses = []
     test_losses = []
-    print("================ Epoch {:04d} ================".format(epoch + 1))
+    
     for epoch in range(n_epochs):
-        losses = []
-        print("Training ", end="")
-        for i, batch in enumerate(train_loader):
-            loss = train_batch(batch, model, optimizer, loss_function, device)
-            losses.append(loss.detach().cpu())
-            print("+", end="")
+        if verbose is True:
+            print("================ Epoch {:04d} ================".format(epoch + 1))
+            print("Training ", end="")
+        losses = dataloader_forward_pass(model, optimizer, loss_function, train_loader, train_batch, device, verbose)
         train_losses.append(np.mean(losses))
-        print()
+        if verbose is True:
+            print()
 
-        print("Testing  ", end="")
         if test_loader is not None:
-            losses = []
-            for i, batch in enumerate(test_loader):
-                loss = validate_batch(batch, model, optimizer, loss_function, device)
-                losses.append(loss.detach().cpu())
-                print("-", end="")
+            if verbose is True:
+                print("Testing  ", end="")
+            losses = dataloader_forward_pass(model, optimizer, loss_function, test_loader, validate_batch, device, verbose)
             test_losses.append(np.mean(losses))
-        print()
+            if verbose is True:
+                print()
 
         if verbose is True:
-            print("Train loss: {:.3f}. Test loss: {:.3f}.".format(
-                    epoch+1, train_losses[-1], test_losses[-1]
-                )
-            )
+            print("Train loss: {:.3f}. Test loss: {:.3f}.".format(train_losses[-1], test_losses[-1]))
     
     return model, train_losses, test_losses
+
+
+def dataloader_forward_pass(
+    model, optimizer, loss_function, dataloader, forward_batch_function=train_batch, 
+    device=torch.device("cpu"), verbose=False
+):
+    losses = []
+    for batch in dataloader:
+        loss = forward_batch_function(batch, model, optimizer, loss_function, device)
+        losses.append(loss.detach().cpu())
+        if verbose is True:
+            print(".", end="")
+    return losses
