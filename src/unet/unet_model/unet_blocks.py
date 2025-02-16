@@ -2,13 +2,12 @@ import torch
     
 
 def pad_x1_to_x2_shape(x1, x2, mode="constant", value=0):
-        x1_w, x1_h = x1.shape[2:]
-        x2_w, x2_h = x2.shape[2:]
+        x1_h, x1_w = x1.shape[2:]
+        x2_h, x2_w = x2.shape[2:]
         d_h = x2_h - x1_h
-        d_w = x2_w - x1_w        
-        x = torch.nn.functional.pad(
-            x1, [d_h//2, d_h-d_h//2, d_w//2, d_w-d_w//2], mode=mode, value=value
-        )
+        d_w = x2_w - x1_w
+        p = [d_w // 2, d_w - d_w // 2, d_h // 2, d_h - d_h // 2]
+        x = torch.nn.functional.pad(x1, p, mode=mode, value=value)
         return x
 
 
