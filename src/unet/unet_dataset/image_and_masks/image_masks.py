@@ -16,6 +16,7 @@ class ImageMasksDataset(torch.utils.data.Dataset):
         mask_folder="masks/", 
         transforms=None,
         train=False,
+        image_size=None,
     ):
         self.data_dir = data_dir
         self.image_folder = image_folder
@@ -28,7 +29,7 @@ class ImageMasksDataset(torch.utils.data.Dataset):
 
         self.transforms = transforms
         if self.transforms is None:
-            self.transforms = get_transform(train)
+            self.transforms = get_transform(train, image_size=image_size)
 
 
     def __getitem__(self, i):

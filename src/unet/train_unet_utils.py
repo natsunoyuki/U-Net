@@ -118,9 +118,7 @@ def dataloader_forward_pass(
         losses.append(loss.detach().cpu())
 
         if verbose is True:
-            pbar.set_description("{:5d}/{:5d} loss={:.2f}".format(
-                i+1, total, loss.detach().cpu())
-            )
+            pbar.set_description("Loss={:.2f}".format(loss.detach().cpu()))
             pbar.update()
 
     return losses
