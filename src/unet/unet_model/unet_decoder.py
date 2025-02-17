@@ -6,11 +6,12 @@ from unet.unet_model.unet_blocks import UpConvDoubleConv2d
 class Decoder(torch.nn.Module):
     def __init__(
         self,	
-        channels=[1024, 512, 256, 128, 64, 2], 
+        channels=[32, 16, 18, 1], 
         kernel_size=3, 
         stride=1, 
         padding=1, 
         bias=False,
+        up_conv_by_resampling=True,
         up_conv_kernel_size=2,
         up_conv_stride=2, 
         up_conv_padding=0, 
@@ -26,12 +27,14 @@ class Decoder(torch.nn.Module):
                 stride=stride, 
                 padding=padding, 
                 bias=bias,
+                up_conv_by_resampling=up_conv_by_resampling,
                 up_conv_kernel_size=up_conv_kernel_size, 
                 up_conv_stride=up_conv_stride, 
                 up_conv_padding=up_conv_padding, 
                 up_conv_bias=up_conv_bias,
             )
             self.blocks.append(bl)
+
         self.blocks = torch.nn.ModuleList(self.blocks)
 
         self.output_segmentation_conv = torch.nn.Conv2d(
@@ -43,6 +46,7 @@ class Decoder(torch.nn.Module):
     def forward(self, encoder_outputs):
         x = encoder_outputs[-1]
         encoder_outputs = encoder_outputs[::-1][1:]
+
         for block, enc_x in zip(self.blocks, encoder_outputs):
             x = block(x, enc_x)
 

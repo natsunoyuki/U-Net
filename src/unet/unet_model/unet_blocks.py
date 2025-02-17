@@ -102,7 +102,7 @@ class UpConvDoubleConv2d(torch.nn.Module):
         stride=1, 
         padding=1, 
         bias=False,
-        upconv_by_resampling=True,
+        up_conv_by_resampling=True,
         up_conv_kernel_size=2, 
         up_conv_stride=2, 
         up_conv_padding=0, 
@@ -112,7 +112,7 @@ class UpConvDoubleConv2d(torch.nn.Module):
         # In the paper https://arxiv.org/pdf/1505.04597 the up-convolution is
         # defined to be a resampling followed by a 2x2 convolution. This can be
         # replaced with a convolution-tranpose-2d operation instead.
-        if upconv_by_resampling is True:
+        if up_conv_by_resampling is True:
             self.upconv = torch.nn.Sequential(
                 torch.nn.Upsample(
                     scale_factor=up_conv_stride,
