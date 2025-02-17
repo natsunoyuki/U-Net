@@ -7,5 +7,6 @@ requires = [
     "pycocotools",
     "natsort",
     "tqdm",
+    "torchmetrics",
 ]
 build-backend = "setuptools.build_meta"
