@@ -172,14 +172,16 @@ def train(
                 test_accuracies.append(np.mean(a, axis = 0))
 
         if verbose is True:
-            print("Train loss: {:.3f}. Test loss: {:.3f}.".format(
-                    train_losses[-1], test_losses[-1],
-                )
-            )
-    
-    train_losses = np.array(train_losses)
-    test_losses = np.array(test_losses)
-    train_accuracies = np.array(train_accuracies)
-    test_accuracies = np.array(test_accuracies)
+            t = "Train loss: {:.3f}. Test loss: {:.3f}.".format(
+                    train_losses[-1], test_losses[-1])
+            if metrics is not None:
+                t = t + " Train acc: {:.3f}. Test acc: {:.3f}.".format(
+                    train_accuracies[-1][-1], test_accuracies[-1][-1])
+            print(t)
+
+    train_losses = np.array(train_losses) # shape=(n_epochs,)
+    test_losses = np.array(test_losses) # shape=(n_epochs,)
+    train_accuracies = np.array(train_accuracies) # shape=(n_epochs, n_metrics)
+    test_accuracies = np.array(test_accuracies) # shape=(n_epochs, n_metrics)
 
     return model, train_losses, test_losses, train_accuracies, test_accuracies
