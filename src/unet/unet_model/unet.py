@@ -15,7 +15,7 @@ class UNet(torch.nn.Module):
             kernel_size=3, 
             stride=1, 
             padding=1, 
-            bias=False,
+            bias=True,
             max_pool_kernel_size=2, 
             max_pool_stride=None, 
             max_pool_padding=0,
@@ -25,11 +25,11 @@ class UNet(torch.nn.Module):
             kernel_size=3, 
             stride=1, 
             padding=1, 
-            bias=False,
+            bias=True,
             up_conv_kernel_size=2, 
             up_conv_stride=2, 
             up_conv_padding=0, 
-            up_conv_bias=False, 
+            up_conv_bias=True, 
         )
 
         self.sigmoid = torch.nn.Sigmoid()

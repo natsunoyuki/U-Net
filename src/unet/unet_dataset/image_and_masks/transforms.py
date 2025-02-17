@@ -44,7 +44,9 @@ class PILToTensor(torch.nn.Module):
         image = pil_to_tensor(image)
         if mask is not None:
             mask = pil_to_tensor(mask)
-            mask = mask.round() # to {0, 1}.
+            mask = mask.round() # Round pixel values to {0, 1}.
+            # Note: setting to torch.long on Apple Silicon MPS will cause the
+            # training to crash.
         return image, mask
 
 
@@ -98,5 +100,4 @@ class GaussianNoise(torch.nn.Module):
     def forward(self, image, mask = None):
         if torch.rand(1) < self.p:
             image = self.gaussian_noise(image)
-
         return image, mask
