@@ -44,10 +44,13 @@ class UNet(torch.nn.Module):
             up_conv_bias=up_conv_bias, 
         )
 
-        self.sigmoid = torch.nn.Sigmoid()
 
     def forward(self, x):
         encoder_outputs = self.encoder(x)
         x = self.decoder(encoder_outputs) 
-        x = self.sigmoid(x)
         return x
+
+
+    def predict(self, x):
+        self.eval()
+        return self.forward(x).sigmoid()

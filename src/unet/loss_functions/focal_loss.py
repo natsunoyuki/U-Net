@@ -10,11 +10,12 @@ class FocalLoss():
         self.gamma = gamma
         self.reduction = reduction
     
-    def __call__(self, inputs, targets):
-        return sigmoid_focal_loss(
-            inputs, 
+    def __call__(self, logits, targets):
+        loss = sigmoid_focal_loss(
+            logits, # These must be logits and not probabilities!
             targets, 
             alpha=self.alpha, 
             gamma=self.gamma, 
             reduction=self.reduction,
         ) 
+        return loss
