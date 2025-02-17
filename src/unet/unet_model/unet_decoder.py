@@ -35,7 +35,9 @@ class Decoder(torch.nn.Module):
         self.blocks = torch.nn.ModuleList(self.blocks)
 
         self.output_segmentation_conv = torch.nn.Conv2d(
-            channels[-2], channels[-1], kernel_size=1,
+            channels[-2], 
+            channels[-1], 
+            kernel_size=1,
         )
 
     def forward(self, encoder_outputs):
