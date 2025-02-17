@@ -6,7 +6,7 @@ from unet.unet_model.unet_blocks import UpConvDoubleConv2d
 class Decoder(torch.nn.Module):
     def __init__(
         self,	
-        channels=[32, 16, 18, 1], 
+        channels=[32, 16, 8, 1], 
         kernel_size=3, 
         stride=1, 
         padding=1, 
@@ -18,9 +18,10 @@ class Decoder(torch.nn.Module):
         up_conv_bias=False, 
     ):
         super().__init__()
+
         self.blocks = []
         for i in range(len(channels[:-1])-1):
-            bl = UpConvDoubleConv2d(
+            b = UpConvDoubleConv2d(
                 in_channels=channels[i], 
                 out_channels=channels[i+1], 
                 kernel_size=kernel_size, 
@@ -33,8 +34,7 @@ class Decoder(torch.nn.Module):
                 up_conv_padding=up_conv_padding, 
                 up_conv_bias=up_conv_bias,
             )
-            self.blocks.append(bl)
-
+            self.blocks.append(b)
         self.blocks = torch.nn.ModuleList(self.blocks)
 
         self.output_segmentation_conv = torch.nn.Conv2d(
@@ -44,6 +44,9 @@ class Decoder(torch.nn.Module):
         )
 
     def forward(self, encoder_outputs):
+        # encoder_outputs = [block_0, block_1, block_2, ... block_n], where 
+        # block_0 has a smaller number of channels but larger feature maps, and 
+        # block_n has a larger number of channels but smaller feature maps.
         x = encoder_outputs[-1]
         encoder_outputs = encoder_outputs[::-1][1:]
 

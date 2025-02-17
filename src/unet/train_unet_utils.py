@@ -15,6 +15,13 @@ def unbatch(batch, device=torch.device("cpu")):
     return images.to(device), masks.to(device)
 
 
+def free_up_gpu_memory(images, masks, mask_preds = None):
+    images.to("cpu")
+    masks.to("cpu")
+    if mask_preds is not None:
+        mask_preds.to("cpu")
+
+
 def evaluate_metrics(y_preds, ys, metrics):
     """Evaluates accuracy for each metric in the list metrics."""
     accuracies_per_metric = []
@@ -42,6 +49,9 @@ def train_batch(
     optimizer.step()
 
     accuracies = evaluate_metrics(y_preds=y_preds, ys=ys, metrics=metrics)
+
+    free_up_gpu_memory(Xs, ys, y_preds)
+    
     return loss.detach().cpu(), accuracies
 
 
@@ -63,6 +73,9 @@ def validate_batch(
     loss = loss_function(y_preds, ys)
 
     accuracies = evaluate_metrics(y_preds=y_preds, ys=ys, metrics=metrics)
+    
+    free_up_gpu_memory(Xs, ys, y_preds)
+
     return loss.detach().cpu(), accuracies
 
 

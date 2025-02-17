@@ -19,6 +19,7 @@ class UNet(torch.nn.Module):
         up_conv_bias=True, 
     ):
         super().__init__()
+
         self.encoder = Encoder(
             channels=[in_channels] + conv_channels, 
             kernel_size=kernel_size, 
@@ -29,6 +30,7 @@ class UNet(torch.nn.Module):
             max_pool_stride=None, 
             max_pool_padding=0,
         )
+
         self.decoder = Decoder(
             channels=conv_channels[::-1]+[out_channels], 
             kernel_size=kernel_size, 
@@ -49,4 +51,3 @@ class UNet(torch.nn.Module):
         x = self.decoder(encoder_outputs) 
         x = self.sigmoid(x)
         return x
-        

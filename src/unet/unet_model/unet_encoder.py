@@ -6,7 +6,7 @@ from unet.unet_model.unet_blocks import DoubleConv2d, MaxPoolDoubleConv2d
 class Encoder(torch.nn.Module):
     def __init__(
         self,
-        channels=[1, 8, 16, 32], 
+        channels=[3, 8, 16, 32], 
         kernel_size=3, 
         stride=1, 
         padding=1, 
@@ -19,7 +19,8 @@ class Encoder(torch.nn.Module):
         self.blocks = []
         for i in range(len(channels)-1):
             if i == 0:
-                bl = DoubleConv2d(
+                # Upper most layer has no maxpooling.
+                b = DoubleConv2d(
                     in_channels=channels[i], 
                     out_channels=channels[i+1], 
                     kernel_size=kernel_size, 
@@ -28,7 +29,8 @@ class Encoder(torch.nn.Module):
                     bias=bias,
                 )
             else:
-                bl = MaxPoolDoubleConv2d(
+                # Maxpooling occurs only for the second layer onwards.
+                b = MaxPoolDoubleConv2d(
                     in_channels=channels[i], 
                     out_channels=channels[i+1], 
                     kernel_size=kernel_size, 
@@ -39,7 +41,7 @@ class Encoder(torch.nn.Module):
                     max_pool_stride=max_pool_stride, 
                     max_pool_padding=max_pool_padding,
                 )
-            self.blocks.append(bl)
+            self.blocks.append(b)
 
         self.blocks = torch.nn.ModuleList(self.blocks)
 
@@ -48,4 +50,8 @@ class Encoder(torch.nn.Module):
         for block in self.blocks:
             x = block(x)
             outputs.append(x)
+
+        # [block_0, block_1, block_2, ... block_n], where block_0 has a smaller 
+        # number of channels but larger feature maps, and block_n has a larger
+        # number of channels but smaller feature maps.
         return outputs

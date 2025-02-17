@@ -146,9 +146,17 @@ class UpConvDoubleConv2d(torch.nn.Module):
         )
 
     def forward(self, x1, x2):
+        # Up-convolve the feature maps from the lower layer. 
+        # E.g. [16, 64, 64] -> [8, 128, 128]
         x1 = self.upconv(x1)
+
+        # And then concatenate the up-convolved features with the features from
+        # the current layer.
+        # E.g. [8, 128, 128] + [8,128, 128] -> [16, 128, 128]
         if x1.shape != x2.shape:
             x1 = pad_x1_to_x2_shape(x1, x2)
         x1 = torch.cat([x1, x2], dim=1)
+
+        # [16, 128, 128] -> [8, 128, 128]
         x2 = self.conv2d(x1)
         return x2
