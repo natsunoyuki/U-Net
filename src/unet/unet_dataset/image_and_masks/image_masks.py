@@ -34,8 +34,7 @@ class ImageMasksDataset(torch.utils.data.Dataset):
     def __getitem__(self, i):
         image_name = self.image_files[i]
         mask_name = self.mask_files[i]
-
-        assert image_name.name == mask_name.name
+        assert image_name.stem == mask_name.stem
 
         img = Image.open(image_name).convert("RGB")
         mask = Image.open(mask_name).convert("L")

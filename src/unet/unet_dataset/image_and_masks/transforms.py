@@ -16,7 +16,7 @@ def get_transform(train: bool=False, image_size=[512, 512]):
     if train is True:
         transforms.append(RandomHorizontalFlip(0.5))
         transforms.append(RandomVerticalFlip(0.5))
-        transforms.append(T2.RandomAffine(90, [0, 0.1], [0.9, 1.1]))
+        #transforms.append(T2.RandomAffine(90, [0, 0.1], [0.9, 1.1]))
         transforms.append(GaussianNoise(0.5, sigma = 0.1))
 
     return Compose(transforms)
