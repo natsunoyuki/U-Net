@@ -15,7 +15,9 @@ def unbatch(batch, device=torch.device("cpu")):
     return images.to(device), masks.to(device)
 
 
-def train_batch(batch, model, optimizer, loss_function, device=torch.device("cpu")):
+def train_batch(
+    batch, model, optimizer, loss_function, device=torch.device("cpu")
+):
     """Trains the model on a batch of images and masks."""
     model.train()
     Xs, ys = unbatch(batch, device = device)
@@ -28,7 +30,9 @@ def train_batch(batch, model, optimizer, loss_function, device=torch.device("cpu
 
 
 @torch.no_grad()
-def validate_batch(batch, model, optimizer, loss_function, device=torch.device("cpu")):
+def validate_batch(
+    batch, model, optimizer, loss_function, device=torch.device("cpu")
+):
     """Validates the model on a batch of images and masks."""
     model.train()
     Xs, ys = unbatch(batch, device = device)
@@ -40,45 +44,83 @@ def validate_batch(batch, model, optimizer, loss_function, device=torch.device("
 
 
 def train(
-    model, optimizer, loss_function, n_epochs, train_loader, test_loader=None, 
-    device=torch.device("cpu"), verbose=False,
+    model, 
+    optimizer, 
+    loss_function, 
+    n_epochs, 
+    train_loader, 
+    test_loader=None, 
+    device=torch.device("cpu"), 
+    verbose=False,
 ):
-    """Trains a model over n_epochs with an optimizer, loss function and data loaders."""
+    """Trains a model over n_epochs with an optimizer, loss function and data 
+    loaders."""
     model.to(device)
     train_losses = []
     test_losses = []
     
     for epoch in range(n_epochs):
         if verbose is True:
-            print("================ Epoch {:04d} ================".format(epoch + 1))
-            print("Training ", end="")
-        losses = dataloader_forward_pass(model, optimizer, loss_function, train_loader, train_batch, device, verbose)
+            print("================ Epoch {:04d} ================".format(
+                epoch + 1)
+            )
+
+        losses = dataloader_forward_pass(
+            model, 
+            optimizer, 
+            loss_function, 
+            train_loader, 
+            train_batch, 
+            device, 
+            verbose,
+        )
         train_losses.append(np.mean(losses))
-        if verbose is True:
-            print()
 
         if test_loader is not None:
-            if verbose is True:
-                print("Testing  ", end="")
-            losses = dataloader_forward_pass(model, optimizer, loss_function, test_loader, validate_batch, device, verbose)
+            losses = dataloader_forward_pass(
+                model, 
+                optimizer, 
+                loss_function, 
+                test_loader, 
+                validate_batch, 
+                device, 
+                verbose,
+            )
             test_losses.append(np.mean(losses))
-            if verbose is True:
-                print()
 
         if verbose is True:
-            print("Train loss: {:.3f}. Test loss: {:.3f}.".format(train_losses[-1], test_losses[-1]))
+            print("Train loss: {:.3f}. Test loss: {:.3f}.".format(
+                train_losses[-1], test_losses[-1])
+            )
     
     return model, train_losses, test_losses
 
 
 def dataloader_forward_pass(
-    model, optimizer, loss_function, dataloader, forward_batch_function=train_batch, 
-    device=torch.device("cpu"), verbose=False
+    model, 
+    optimizer, 
+    loss_function, 
+    dataloader, 
+    forward_batch_function=train_batch, 
+    device=torch.device("cpu"), 
+    verbose=True,
 ):
+    total = len(dataloader)
     losses = []
-    for batch in dataloader:
-        loss = forward_batch_function(batch, model, optimizer, loss_function, device)
+
+    if verbose is True:
+        pbar = tqdm.tqdm(total=total)
+    
+    for i, batch in enumerate(dataloader):
+        loss = forward_batch_function(
+            batch, model, optimizer, loss_function, device,
+        )
         losses.append(loss.detach().cpu())
+
         if verbose is True:
-            print(".", end="")
+            pbar.set_description("{:5d}/{:5d} loss={:.2f}".format(
+                i+1, total, loss.detach().cpu())
+            )
+            pbar.update()
+
     return losses
