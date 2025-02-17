@@ -16,37 +16,38 @@ class Encoder(torch.nn.Module):
         max_pool_padding=0,
     ):
         super().__init__()
-        self.blocks = []
-        for i in range(len(channels)-1):
-            if i == 0:
-                # Upper most layer has no maxpooling.
-                b = DoubleConv2d(
-                    in_channels=channels[i], 
-                    out_channels=channels[i+1], 
-                    kernel_size=kernel_size, 
-                    stride=stride, 
-                    padding=padding, 
-                    bias=bias,
-                )
-            else:
-                # Maxpooling occurs only for the second layer onwards.
-                b = MaxPoolDoubleConv2d(
-                    in_channels=channels[i], 
-                    out_channels=channels[i+1], 
-                    kernel_size=kernel_size, 
-                    stride=stride, 
-                    padding=padding, 
-                    bias=bias,
-                    max_pool_kernel_size=max_pool_kernel_size, 
-                    max_pool_stride=max_pool_stride, 
-                    max_pool_padding=max_pool_padding,
-                )
-            self.blocks.append(b)
 
+        # First input layer only has double convolutions without maxpooling.
+        self.input_double_conv = DoubleConv2d(
+            in_channels=channels[0], 
+            out_channels=channels[1], 
+            kernel_size=kernel_size, 
+            stride=stride, 
+            padding=padding, 
+            bias=bias,
+        )
+
+        self.blocks = []
+        for i in range(1, len(channels[1:])):
+            # Maxpooling occurs only for the second layer onwards.
+            b = MaxPoolDoubleConv2d(
+                in_channels=channels[i], 
+                out_channels=channels[i+1], 
+                kernel_size=kernel_size, 
+                stride=stride, 
+                padding=padding, 
+                bias=bias,
+                max_pool_kernel_size=max_pool_kernel_size, 
+                max_pool_stride=max_pool_stride, 
+                max_pool_padding=max_pool_padding,
+            )
+            self.blocks.append(b)
         self.blocks = torch.nn.ModuleList(self.blocks)
 
     def forward(self, x):
-        outputs = []
+        x = self.input_double_conv(x)
+        outputs = [x]
+        
         for block in self.blocks:
             x = block(x)
             outputs.append(x)

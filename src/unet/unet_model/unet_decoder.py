@@ -19,6 +19,8 @@ class Decoder(torch.nn.Module):
     ):
         super().__init__()
 
+        # The first part of the decoder up-convolves feature maps from the 
+        # previous layers of the encoder.
         self.blocks = []
         for i in range(len(channels[:-1])-1):
             b = UpConvDoubleConv2d(
@@ -37,6 +39,7 @@ class Decoder(torch.nn.Module):
             self.blocks.append(b)
         self.blocks = torch.nn.ModuleList(self.blocks)
 
+        # Output convolution has no up-convolution operations.
         self.output_segmentation_conv = torch.nn.Conv2d(
             channels[-2], 
             channels[-1], 
