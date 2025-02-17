@@ -4,7 +4,7 @@ import natsort
 from PIL import Image
 import numpy as np
 
-
+from unet.unet_dataset.file_utils import list_files
 from unet.unet_dataset.image_and_masks.transforms import get_transform
 
 
@@ -21,17 +21,8 @@ class ImageMasksDataset(torch.utils.data.Dataset):
         self.image_folder = image_folder
         self.mask_folder = mask_folder
 
-        self.image_files = natsort.natsorted((data_dir / image_folder).iterdir())
-        for f in self.image_files:
-            if f.name == ".DS_Store":
-                self.image_files.remove(f)
-        self.image_files = natsort.natsorted(self.image_files)
-        
-        self.mask_files = natsort.natsorted((data_dir / image_folder).iterdir())
-        for f in self.mask_files:
-            if f.name == ".DS_Store":
-                self.mask_files.remove(f)
-        self.mask_files = natsort.natsorted(self.mask_files)
+        self.image_files = list_files(data_dir / image_folder)
+        self.mask_files = list_files(data_dir / mask_folder)
 
         self.train = train
 
