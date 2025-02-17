@@ -1,7 +1,7 @@
 # https://pytorch.org/vision/main/generated/torchvision.ops.sigmoid_focal_loss.html
 # Loss used in RetinaNet for dense detection: https://arxiv.org/abs/1708.02002.
 
-import torchvision.ops.sigmoid_focal_loss
+from torchvision.ops import sigmoid_focal_loss
 
 
 class FocalLoss():
@@ -11,7 +11,7 @@ class FocalLoss():
         self.reduction = reduction
     
     def __call__(self, inputs, targets):
-        return torchvision.ops.sigmoid_focal_loss(
+        return sigmoid_focal_loss(
             inputs, 
             targets, 
             alpha=self.alpha, 
